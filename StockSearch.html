@@ -1,0 +1,211 @@
+<!DOCTYPE html>
+<html lang='en'>
+<head>
+	<meta charset='UTF-8'>
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<meta property="og:url"                content="" />
+	<meta property="og:type"               content="article" />
+	<meta property="og:title"              content="" />
+	<meta property="og:description"        content="" />
+	<meta property="og:image"              content="" />
+
+	<link rel="stylesheet" href="css/bootstrap.min.css">
+	<link rel="stylesheet" href="css/bootstrap-toggle.min.css">
+	<link rel="stylesheet" href="css/bootstrap-social.css">
+	<link rel="stylesheet" href="css/font-awesome.min.css">	
+	<link rel="stylesheet" href="css/jquery-ui.min.css">
+	<link rel="stylesheet" href="css/styles.css">
+	<title>Stock Market Search</title>
+
+</head>
+<body>
+<script>
+  window.fbAsyncInit = function() {
+    FB.init({
+      appId      : '1573429189653830',
+      xfbml      : true,
+      version    : 'v2.5'
+    });
+  };
+
+  (function(d, s, id){
+     var js, fjs = d.getElementsByTagName(s)[0];
+     if (d.getElementById(id)) {return;}
+     js = d.createElement(s); js.id = id;
+     js.src = "//connect.facebook.net/en_US/sdk.js";
+     fjs.parentNode.insertBefore(js, fjs);
+   }(document, 'script', 'facebook-jssdk'));
+</script>
+
+<script src="js/jquery-2.2.1.min.js"></script>
+<script src="js/jquery-ui.min.js"></script>
+<script src="js/moment.js"></script>
+<script src="js/bootstrap.min.js"></script>
+<script src="js/bootstrap-toggle.min.js"></script>
+<script src="https://code.highcharts.com/stock/highstock.js"></script>
+<script src="https://code.highcharts.com/stock/modules/exporting.js"></script>
+<script src="js/script.js"></script>
+
+<div class="container">
+  <div class="well well-lg" id="search_bucket">
+	<div class="text-center">
+		<section class="h4">Stock Market Search</section>
+	</div> 
+  <div class="row">
+  	<form role="form" id="form1">
+		<div class="form-group">
+	      <section class="col-lg-3">
+	      	<label for="email" id="input_notify">Enter the stock name or symbol:</label>
+	      </section>
+	      <section class="col-lg-6">
+	      	<input type="text" name="symbol" class="input- ui-autocomplete-input form-control" id="symbolsearch" placeholder="Apple Inc or AAPL" autocomplete="off" value="" required>
+	      </section>
+	    </div>
+	    <div class="form-group">
+	      <section class="col-lg-3">
+	    	<button type="submit" class="btn btn-default get-quote blue_button" id="get_quote_btn">
+      			<span id="search_button_text">
+      				<span class="glyphicon glyphicon-search"></span> Get Quote
+      			</span>
+    		</button>
+	    	<button type="button" class="btn btn-default gray_button" id="clear_btn">
+	    		<span id="clear_button_text">
+	    			<span class="glyphicon glyphicon-refresh"></span> Clear
+	    		</span>
+	    	</button>
+		  </section>
+		</div>
+	</form>
+  </div>
+  <div class="row">
+  	<section class="col-md-offset-3 col-md-6" id="powered_by">
+  		<section class="error-info" style="display: none;">Select a valid entry</section>
+  	</section>
+  	<section class="col-lg-offset-9 col-lg-3 col-md-offset-8 col-md-4 col-sm-offset-6 col-sm-6" id="powered_by">
+  		Powered By:<a  href="http://dev.markitondemand.com/MODApis/"><img src="images/mod-logo.png" alt="mod logo" width="120" height="20"></a>
+  	</section>
+  </div>
+</div>
+</div>
+<div class="container" id="line_bucket">
+	<section class="row">
+		<div id="line"></div>
+	</section>	
+</div>	
+
+<div class="container">
+	<div class="well well-lg" id="list_bucket">
+		<div id="myCarousel" class="carousel slide" data-ride="carousel">
+			<div class="carousel-inner" role="listbox">
+				<div class="item active" id="carousel_item_1">
+					<div class="panel panel-default">
+						  	<div class="panel-heading">
+						  		<section class="row" id="panel_heading_row">
+						  		<!-- <form role="form" id="form2"> -->	
+						  			<!-- <div class="form-group">  			 -->
+						  			<section class="pull-left">
+								      <span class="h5">Favorite List</span>
+								    </section>
+								    <section>
+								    	<section class="pull-right">
+								    		<a class="no-anchor" href="#" data-toggle="tooltip" title="see the stock information">
+										    	<button type="button" class="btn btn-default gray_button disabled" id="carousel_right_btn">										    		
+										    			<span class="glyphicon glyphicon-chevron-right"></span>										    		
+										    	</button>
+									    	</a>
+									    </section>
+									    <section class="pull-right">
+									    	<a class="no-anchor" href="#" data-toggle="tooltip" title="refresh the stock price and change information in Favorite List">
+										    	<button type="button" class="btn btn-default gray_button" id="refresh_btn">
+										    		<span class="glyphicon glyphicon-refresh"></span>
+										    	</button>
+										    </a>
+									    </section>
+									    <a class="no-anchor" href="#" data-toggle="tooltip" title="enable refreshing the Favourite List every 5 seconds">
+								    		<section class="pull-right"><input type="checkbox" data-toggle="toggle" id="refresh_toggle"></section>
+								    	</a>
+								    	<section class="small pull-right hidden-xs">Automatic Refresh: </section>
+								    </section>
+									<!-- </div> -->
+								<!-- </form> -->
+						  		</section>
+						  	</div>
+						  	<div class="panel-body">
+						  		<section id="favorite_list_container">
+							  		<table class="table table-striped" id="favorite_list" style="min-width:600px">
+						  				<tr>
+						  					<th>Symbol</th>
+						  					<th>Company Name</th>
+						  					<th>Stock Price</th>
+						  					<th>Change(Change Persent)</th>
+						  					<th>Market Cap</th>
+						  					<th>          </th>
+						  				</tr>
+							  		</table>
+							  	</section>
+						  	</div>
+						  </div>
+				</div>
+
+				<div class="item" id="carousel_item_2">
+					<div class="panel panel-default">
+						<div class="panel-heading">	
+							<section class="row">
+								<section id="form3">
+									<section class="pull-left">
+							  			<button type="button" class="btn btn-default gray_button" id="carousel_left_btn">
+								    		<span class="glyphicon glyphicon-chevron-left"></span>
+								    	</button>
+							    	</section>
+							    	<section class="text-center">
+							   			<b>Stock Details</b>
+							   		</section>
+						   		</section>
+							</section>	
+						</div>
+						<div class="panel-body">
+							<section class="row">
+								<section class="col-md-8 col-lg-6 col-sm-10 col-xs-12">
+									<ul class="nav nav-pills hidden-xs">
+									  <li class="active"><a data-toggle="pill" href="#current_stock"><span class="glyphicon glyphicon-dashboard"></span> Current Stock</a></li>
+									  <li><a data-toggle="pill" href="#historical_charts"><span class="glyphicon glyphicon-signal"></span> Historical Charts</a></li>
+									  <li><a data-toggle="pill" href="#news_feeds"><span class="glyphicon glyphicon-link"></span> News Feeds</a></li>
+									</ul>
+									<ul class="nav nav-pills visible-xs">
+									  <li class="active"><a data-toggle="pill" href="#current_stock"><span class="glyphicon glyphicon-dashboard"></span> Stock</a></li>
+									  <li><a data-toggle="pill" href="#historical_charts"><span class="glyphicon glyphicon-signal"></span> Charts</a></li>
+									  <li><a data-toggle="pill" href="#news_feeds"><span class="glyphicon glyphicon-link"></span> News</a></li>
+									</ul>
+									
+								</section>								
+							</section>
+							<section class="row">
+								<div class="tab-content">
+										<div id="current_stock" class="tab-pane fade in active">
+											<div id="current_stock_top" class="row"></div>
+											<div id="current_stock_left" class="col-md-6"></div>
+											<div id="current_stock_right" class="col-md-6"></div>											
+										</div>
+
+										<div id="historical_charts" class="tab-pane fade">
+											<!-- <div id="chart_container" style="min-width:850px; height:500px;"></div> -->
+										</div>
+										<div id="news_feeds" class="tab-pane fade">
+											<div class="container-fluid" id="news_feeds_container"></div>
+										</div>
+									</div>
+							</section>						
+						</div>
+					</div>			      
+			    </div>
+			</div>
+		</div>
+	  
+	</div>
+</div>
+
+<ul class="ui-autocomplete ui-front ui-menu ui-widget ui-widget-content ui-corner-all" id="ui-id-1" tabindex="0" style="display: none;"></ul>
+</body>
+</html>
+ 
